@@ -10,7 +10,7 @@
           <el-select v-model="filters.year" placeholder="请选择年份" @change="filterData" style="width: 25%; margin-right: 20px;" clearable>
             <el-option v-for="year in uniqueYears" :key="year" :label="year" :value="year" />
           </el-select>
-          <el-select v-model="filters.name" placeholder="请选择项目" @change="filterData" style="width: 25%; margin-right: 20px;" clearable>
+          <el-select v-model="filters.name" placeholder="请选择产业" @change="filterData" style="width: 25%; margin-right: 20px;" clearable>
             <el-option v-for="name in uniqueNames" :key="name" :label="name" :value="name" />
           </el-select>
         </div>

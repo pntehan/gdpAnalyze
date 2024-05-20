@@ -41,22 +41,22 @@
       <el-row :gutter="24">
         <el-col :span="12" style="margin-bottom: 20px;">
           <el-card>
-            <div ref="pieChartRef" style="height: 300px" />
+            <div ref="pieChartRef" style="height: 400px" />
           </el-card>
         </el-col>
         <el-col :span="12" style="margin-bottom: 20px;">
           <el-card>
-            <div ref="barChartRef" style="height: 300px" />
+            <div ref="barChartRef" style="height: 400px" />
           </el-card>
         </el-col>
         <el-col :span="12" style="margin-bottom: 100px;">
           <el-card>
-            <div ref="scatterChartRef" style="height: 300px" />
+            <div ref="radarChartRef" style="height: 400px" />
           </el-card>
         </el-col>
         <el-col :span="12" style="margin-bottom: 100px;">
           <el-card>
-            <div ref="scatterChartRef" style="height: 300px" />
+            <div ref="diskChartRef" style="height: 400px" />
           </el-card>
         </el-col>
       </el-row>
@@ -80,7 +80,8 @@ const tableData = ref([])
 const lineChartRef = ref(null)
 const pieChartRef = ref(null)
 const barChartRef = ref(null)
-const scatterChartRef = ref(null)
+const radarChartRef = ref(null)
+const diskChartRef = ref(null)
 
 onMounted(() => {
   // 从服务端获取省份和年份数据、
@@ -98,7 +99,8 @@ onMounted(() => {
     initLineChart()
     initPieChart()
     initBarChart()
-    initScatterChart()
+    initRadarChart()
+    initDiskChart()
   })
 })
 
@@ -116,11 +118,13 @@ function fetchTableData(province, year) {
 function changeRegion() {
   initLineChart()
   initPieChart()
+  initRadarChart()
 }
 
 function changeYear() {
   initBarChart()
   initPieChart()
+  initRadarChart()
 }
 
 function initLineChart() {
@@ -286,11 +290,159 @@ function initBarChart() {
   barChart.setOption(option)
 }
 
-function initScatterChart() {
-  const scatterChart = echarts.init(scatterChartRef.value)
+function initRadarChart() {
+  const radarChart = echarts.init(radarChartRef.value)
+  // 数据准备
+  const series_data = []
+  const indicator = []
+  let max_data = 0
+  for (let data of tableData.value) {
+    if (data.name == '地区生产总值') {
+      continue
+    }
+    series_data.push(data.value)
+    if (data.value > max_data) {
+      max_data = data.value
+    }
+  }
+  for (let data of tableData.value) {
+    if (data.name == '地区生产总值') {
+      continue
+    }
+    indicator.push({
+      name: data.name,
+      max: max_data
+    })
+  }
+  const option = {
+    title: {
+      text: selectedProvince.value+selectedYear.value+'子产业产值对比图',
+      x: 'center',
+      y: 'top'
+    },
+    grid: {
+      top: '10%',
+      left: '5%',
+      right: '5%',
+      bottom: '0%',
+      containLabel: true
+    },
+    radar: {
+      // shape: 'circle',
+      indicator: indicator
+    },
+    series: [
+      {
+        name: '产业数据分布',
+        type: 'radar',
+        data: [
+          {
+            value: series_data,
+            name: selectedProvince.value
+          }
+        ]
+      }
+    ]
+}
   // 配置散点图选项
-  scatterChart.setOption({
-    // ...
-  })
+  radarChart.setOption(option)
+}
+
+function initDiskChart() {
+  const diskChart = echarts.init(diskChartRef.value)
+  // 数据处理
+  const diskData = []
+  for (let province of provinces.value) {
+    let item = {
+      'value': 0,
+      'name': province,
+      'path': province,
+      'children': []
+    }
+    for (let year of years.value) {
+      let item_i = {
+        'value': 0,
+        'name': province+'/'+year,
+        'path': province+'/'+year,
+        'children': []
+      }
+      for (let name of names.value) {
+        let item_j = {
+          'value': gdpData.value.find(item => item.region == province && item.year == year && item.name == name).value,
+          'name': province+'/'+year+'.'+name,
+          'path': province+'/'+year+'.'+name
+        }
+        item_i.value = item.value + item_j.value
+        item_i.children.push(item_j)
+      }
+      item.value = item.value + item_i.value
+      item.children.push(item_i)
+    }
+    diskData.push(item)
+  }
+  const option = {
+    title: {
+      text: '黄河流域全部数据展示',
+      left: 'center'
+    },
+    tooltip: {
+      formatter: function (info) {
+        let name = info.name
+        let value = info.value;
+        let treePathInfo = info.treePathInfo;
+        let treePath = []
+        for (let i = 1; i < treePathInfo.length; i++) {
+          treePath.push(treePathInfo[i].name)
+        }
+        return [
+          '<div class="tooltip-title">' +
+            name +
+            '</div>',
+          '金额: ' + value + ' 亿元'
+        ].join('');
+      }
+    },
+    series: [
+      {
+        name: 'gdp数据',
+        type: 'treemap',
+        visibleMin: 300,
+        label: {
+          show: true,
+          formatter: '{b}'
+        },
+        itemStyle: {
+          borderColor: '#fff'
+        },
+        levels: getLevelOption(),
+        data: diskData
+      }
+    ]
+  }
+  // 配置磁盘图选项
+  diskChart.setOption(option)
+}
+
+function getLevelOption() {
+  return [
+    {
+      itemStyle: {
+        borderWidth: 0,
+        gapWidth: 5
+      }
+    },
+    {
+      itemStyle: {
+        gapWidth: 1
+      }
+    },
+    {
+      colorSaturation: [0.35, 0.5],
+      itemStyle: {
+        gapWidth: 1,
+        borderColorSaturation: 0.6
+      }
+    }
+  ]
 }
 </script>
