@@ -21,3 +21,7 @@ def json_response(data):
     response = make_response(jsonify(data))
     response.headers["Content-Type"] = "application/json;charset=UTF-8"
     return response
+
+def extract_year(item):
+    year, _ = item.split('-')
+    return int(year)

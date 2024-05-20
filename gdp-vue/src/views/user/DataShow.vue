@@ -89,7 +89,7 @@ onMounted(() => {
     gdpData.value = res
     // 初始化滤波数据
     provinces.value = [...new Set(gdpData.value.map((item) => item.region))]
-    years.value = [...new Set(gdpData.value.map((item) => item.year))]
+    years.value = [...new Set(gdpData.value.map((item) => item.year))].sort((a, b) => a - b)
     // names.value = [...new Set(gdpData.value.map((item) => item.name))]
     selectedProvince.value = provinces.value[0]
     selectedYear.value = years.value[0]
@@ -141,7 +141,6 @@ function initLineChart() {
     series_data.push({
       name: name,
       type: 'line',
-      stack: 'Total',
       data: data
     })
   }
@@ -234,7 +233,7 @@ function initBarChart() {
   const barChart = echarts.init(barChartRef.value)
   // 数据选择
   const data_list = gdpData.value.filter(item => item.year == selectedYear.value)
-  const data_sort = data_list.filter(item => item.name == '地区生产总值').sort((a, b) => b.value - a.value)
+  const data_sort = data_list.filter(item => item.name == '地区生产总值').sort((a, b) => a.value - b.value)
   const provinces_sort = []
   data_sort.forEach((item) => { 
     provinces_sort.push(item.region)
