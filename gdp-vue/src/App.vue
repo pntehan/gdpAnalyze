@@ -33,5 +33,10 @@ export default defineComponent({
 #app {
   height: 100%;
   width: 100%;
+  justify-content: center;
+  // background-image: url('@/assets/bg_all.jpg');
+  // background-repeat: repeat;
+  // background-size: 100% 100%;
+  // position: absolute;
 }
 </style>

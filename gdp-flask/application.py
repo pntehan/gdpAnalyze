@@ -10,11 +10,13 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
+from flask_cors import CORS
 import config
 
 
 # Flask程序生成
 app = Flask(__name__)
+cors = CORS(app, resources={r"*": {"origins": "*"}})
 app.config.from_object(config)
 # 数据库初始化app
 db = SQLAlchemy(app)
@@ -22,3 +24,5 @@ db = SQLAlchemy(app)
 
 # 加载路由
 from controller import *
+
+app.register_blueprint(DataRouter)

@@ -43,25 +43,5 @@ export default {
 .container {
   margin-top: 80px;
   margin-bottom: 100px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url('@/assets/bg.jpg');
-  background-size: cover;
-  background-position: center;
-  z-index: -1;
-}
-
-.container::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(8px);
-  pointer-events: none;
 }
 </style>

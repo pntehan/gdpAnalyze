@@ -1,0 +1,296 @@
+<template>
+  <el-container class="main-container" style="margin-left: auto; margin-right: auto; max-width: 1200px;">
+    <el-row :gutter="24">
+      <el-col :span="6" style="margin-top: 20px; margin-bottom: 20px;">
+        <el-card>
+          <el-form>
+            <el-form-item label="省份">
+              <el-select v-model="selectedProvince" @change="changeRegion()" placeholder="选择省份">
+                <el-option
+                  v-for="province in provinces"
+                  :key="province"
+                  :label="province"
+                  :value="province"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="年份">
+              <el-select v-model="selectedYear" @change="changeYear()" placeholder="选择年份">
+                <el-option
+                  v-for="year in years"
+                  :key="year"
+                  :label="year"
+                  :value="year"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <el-table :data="tableData" max-height="300">
+            <el-table-column prop="name" label="指标名称" />
+            <el-table-column prop="value" label="金额(亿元)" />
+          </el-table>
+        </el-card>
+      </el-col>
+      <el-col :span="18" style="margin-top: 20px; margin-bottom: 20px">
+        <el-card>
+          <div ref="lineChartRef" style="height: 400px" />
+        </el-card>
+      </el-col>
+    </el-row>
+    <el-footer>
+      <el-row :gutter="24">
+        <el-col :span="12" style="margin-bottom: 20px;">
+          <el-card>
+            <div ref="pieChartRef" style="height: 300px" />
+          </el-card>
+        </el-col>
+        <el-col :span="12" style="margin-bottom: 20px;">
+          <el-card>
+            <div ref="barChartRef" style="height: 300px" />
+          </el-card>
+        </el-col>
+        <el-col :span="12" style="margin-bottom: 100px;">
+          <el-card>
+            <div ref="scatterChartRef" style="height: 300px" />
+          </el-card>
+        </el-col>
+        <el-col :span="12" style="margin-bottom: 100px;">
+          <el-card>
+            <div ref="scatterChartRef" style="height: 300px" />
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-footer>
+  </el-container>
+</template>
+
+<script setup>
+import { ref, onMounted, watchEffect } from 'vue'
+import * as echarts from 'echarts'
+import { getGDPData } from '@/api/Data'
+
+const gdpData = ref([])
+const selectedProvince = ref('')
+const selectedYear = ref('')
+const provinces = ref([])
+const years = ref([])
+const names = ref(['地区生产总值', '第一产业增加值', '第二产业增加值', '第三产业增加值'])
+const tableData = ref([])
+
+const lineChartRef = ref(null)
+const pieChartRef = ref(null)
+const barChartRef = ref(null)
+const scatterChartRef = ref(null)
+
+onMounted(() => {
+  // 从服务端获取省份和年份数据、
+  getGDPData().then(res => {
+    gdpData.value = res
+    // 初始化滤波数据
+    provinces.value = [...new Set(gdpData.value.map((item) => item.region))]
+    years.value = [...new Set(gdpData.value.map((item) => item.year))]
+    // names.value = [...new Set(gdpData.value.map((item) => item.name))]
+    selectedProvince.value = provinces.value[0]
+    selectedYear.value = years.value[0]
+    // 初始化表格数据
+    tableData.value = fetchTableData(selectedProvince.value, selectedYear.value)
+    // 初始化图表
+    initLineChart()
+    initPieChart()
+    initBarChart()
+    initScatterChart()
+  })
+})
+
+watchEffect(() => {
+  // 当省份或年份改变时,更新表格数据
+  tableData.value = fetchTableData(selectedProvince.value, selectedYear.value)
+})
+
+
+function fetchTableData(province, year) {
+  // 从服务端获取表格数据
+  return gdpData.value.filter(item => item.region == province && item.year == year)
+}
+
+function changeRegion() {
+  initLineChart()
+  initPieChart()
+}
+
+function changeYear() {
+  initBarChart()
+  initPieChart()
+}
+
+function initLineChart() {
+  const lineChart = echarts.init(lineChartRef.value)
+  // 数据选择
+  const data_list = gdpData.value.filter(item => item.region == selectedProvince.value).sort((a, b) => a.year - b.year)
+  const series_data = []
+  for (let name of names.value) {
+    let data = []
+    for (let year of years.value) {
+      let d = data_list.find(item => item.year == year && item.name == name)
+      data.push(d.value)
+    }
+    series_data.push({
+      name: name,
+      type: 'line',
+      stack: 'Total',
+      data: data
+    })
+  }
+  const option = {
+    title: {
+      text: selectedProvince.value + '历史数据变化',
+      x: 'center',
+      y: 'top'
+    },
+    tooltip: {
+      trigger: 'axis'
+    },
+    legend: {
+      data: names.value,
+      y: 'bottom',
+      padding: [20, 0, 0, 0]
+    },
+    grid: {
+      left: '3%',
+      right: '5%',
+      bottom: '5%',
+      containLabel: true
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {}
+      }
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: years.value.sort((a, b) => a - b),
+      name: '年份'
+    },
+    yAxis: {
+      type: 'value',
+      name: '单位:亿元'
+    },
+    series: series_data
+  }
+  // 配置折线图选项
+  lineChart.setOption(option)
+}
+
+function initPieChart() {
+  const pieChart = echarts.init(pieChartRef.value)
+  // 数据选择
+  const data = []
+  names.value.forEach((name) => {
+    if (name == '地区生产总值') { 
+      return 
+    }
+    let item = tableData.value.find(item => item.name == name)
+    data.push(item)
+  })
+  const option = {
+    title: {
+      text: selectedProvince.value + selectedYear.value + '年三产占比分析',
+      x: 'center',
+      y: 'top'
+    },
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      y: 'bottom',
+      padding: [20, 0, 0, 0]
+    },
+    series: [
+      {
+        name: '单位:亿元',
+        type: 'pie',
+        radius: '50%',
+        data: data,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  }
+  // 配置饼图选项
+  pieChart.setOption(option)
+}
+
+function initBarChart() {
+  const barChart = echarts.init(barChartRef.value)
+  // 数据选择
+  const data_list = gdpData.value.filter(item => item.year == selectedYear.value)
+  const data_sort = data_list.filter(item => item.name == '地区生产总值').sort((a, b) => b.value - a.value)
+  const provinces_sort = []
+  data_sort.forEach((item) => { 
+    provinces_sort.push(item.region)
+  })
+  // 数据处理
+  const series_data = []
+  for (let name of names.value) {
+    let ds = data_list.filter(item => item.name == name).sort((a, b) => a.value - b.value)
+    let data = []
+    for (let d of ds) {
+      data.push(d.value)
+    }
+    series_data.push({
+      name: name, 
+      type: 'bar',
+      data: data
+    })
+  }
+  const option = {
+    title: {
+      text: selectedYear.value+'年黄河流域省份GDP排名',
+      x: 'center',
+      y: 'top'
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    legend: {
+      y: 'bottom',
+      padding: [20, 0, 0, 0]
+    },
+    grid: {
+      left: '3%',
+      right: '13%',
+      bottom: '6%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      boundaryGap: [0, 0.01],
+      name: '单位:亿元'
+    },
+    yAxis: {
+      type: 'category',
+      data: provinces_sort
+    },
+    series: series_data
+  }
+  // 配置柱状图选项
+  barChart.setOption(option)
+}
+
+function initScatterChart() {
+  const scatterChart = echarts.init(scatterChartRef.value)
+  // 配置散点图选项
+  scatterChart.setOption({
+    // ...
+  })
+}
+</script>

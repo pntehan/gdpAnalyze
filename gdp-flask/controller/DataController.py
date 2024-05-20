@@ -9,6 +9,15 @@
 
 
 from flask import Blueprint
+from service.DataService import DataServcie
+
 
 # 创建数据蓝图
 DataRouter = Blueprint("DataRouter", __name__, url_prefix="/data")
+# 创建服务对象
+data_service = DataServcie()
+
+
+@DataRouter.route("/getGDPData", methods=["GET"])
+def getGDPData():
+    return data_service.getGDPData()

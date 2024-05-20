@@ -6,11 +6,9 @@
     </div>
     <el-tabs v-model="activeTab" @tab-click="handleTabClick">
       <el-tab-pane label="主页" name="home"></el-tab-pane>
-      <el-tab-pane label="心理测评" name="exam"></el-tab-pane>
-      <el-tab-pane label="公告信息" name="announcement"></el-tab-pane>
-      <el-tab-pane label="心理文章" name="new"></el-tab-pane>
-      <el-tab-pane label="预约中心" name="book"></el-tab-pane>
-      <el-tab-pane label="咨询专栏" name="consult"></el-tab-pane>
+      <el-tab-pane label="历史GDP统计分析" name="dataAnalyse"></el-tab-pane>
+      <el-tab-pane label="GDP数据可视化" name="dataShow"></el-tab-pane>
+      <el-tab-pane label="未来GDP预测" name="dataPredict"></el-tab-pane>
       <!-- Add more tabs as needed -->
     </el-tabs>
     <div class="user-info">
@@ -21,8 +19,6 @@
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item @click="handlePush('user')">个人中心</el-dropdown-item>
-          <el-dropdown-item @click="handlePush('star')">我的收藏</el-dropdown-item>
-          <el-dropdown-item @click="handlePush('msg')">我的消息</el-dropdown-item>
           <el-dropdown-item @click="handleOut">退出</el-dropdown-item>
         </el-dropdown-menu>
       </template>

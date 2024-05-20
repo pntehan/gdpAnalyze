@@ -13,49 +13,24 @@ const routes = [
         component: () => import('@/views/user/Home.vue')
       },
       {
-        path: "/exam",
-        name: "exam",
-        component: () => import('@/views/user/Exam.vue')
+        path: "/dataAnalyse",
+        name: "dataAnalyse",
+        component: () => import('@/views/user/DataAnalyse.vue')
       },
       {
-        path: "/announcement",
-        name: "announcement",
-        component: () => import('@/views/user/Announcement.vue')
+        path: "/dataShow",
+        name: "dataShow",
+        component: () => import('@/views/user/DataShow.vue')
       },
       {
-        path: "/new",
-        name: "new",
-        component: () => import('@/views/user/New.vue')
-      },
-      {
-        path: "/new/:id",
-        name: "newDetail",
-        component: () => import("@/views/user/NewDetail.vue")
-      },
-      {
-        path: "/book",
-        name: "book",
+        path: "/dataPredict",
+        name: "dataPredict",
         component: () => import("@/views/user/Book.vue")
-      },
-      {
-        path: "/consult",
-        name: "consult",
-        component: () => import("@/views/user/Consult.vue")
       },
       {
         path: "/user",
         name: "user",
         component: () => import("@/views/user/User.vue")
-      },
-      {
-        path: "/star",
-        name: "star",
-        component: () => import("@/views/user/Star.vue")
-      },
-      {
-        path: "/msg",
-        name: "msg",
-        component: () => import("@/views/user/Msg.vue")
       }
     ]
   },
@@ -128,33 +103,33 @@ const router = createRouter({
 
 export default router;
 
-// 全局路由守卫
-router.beforeEach((to, from, next) => {
-  if (to.fullPath.includes("404")) {
-    next()
-  }
-  if (to.matched.length == 0) {
-    next("/404")
-  }
-  if (to.fullPath.includes("login") | to.fullPath.includes("register")) {
-    next()
-  } 
-  else if (localStorage.getItem("user_info")) {
-    let user_info = JSON.parse(localStorage.getItem("user_info"))
-    // 管理员检查
-    if (to.fullPath.includes("admin")) {
-      if (user_info.role == "管理员") {
-        next()
-      }
-      else {
-        next("/404")
-      }
-    }
-    else {
-      next()
-    }
-  }
-  else {
-    next("/login")
-  }
-})
+// // 全局路由守卫
+// router.beforeEach((to, from, next) => {
+//   if (to.fullPath.includes("404")) {
+//     next()
+//   }
+//   if (to.matched.length == 0) {
+//     next("/404")
+//   }
+//   if (to.fullPath.includes("login") | to.fullPath.includes("register")) {
+//     next()
+//   } 
+//   else if (localStorage.getItem("user_info")) {
+//     let user_info = JSON.parse(localStorage.getItem("user_info"))
+//     // 管理员检查
+//     if (to.fullPath.includes("admin")) {
+//       if (user_info.role == "管理员") {
+//         next()
+//       }
+//       else {
+//         next("/404")
+//       }
+//     }
+//     else {
+//       next()
+//     }
+//   }
+//   else {
+//     next("/login")
+//   }
+// })

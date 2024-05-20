@@ -3,7 +3,7 @@
     <div class="login-main">
       <div class="main-panel">
         <div class="panel-left">
-          <img src="@/assets/student.jpg" class="left-image" />
+          <img src="@/assets/login.jpg" class="left-image" />
         </div>
         <div class="panel-right">
           <div class="panel-head">
@@ -144,6 +144,7 @@ export default {
     flex: 1;
     .left-image {
       padding: 40px;
+      height: 400px;
     }
   }
 
