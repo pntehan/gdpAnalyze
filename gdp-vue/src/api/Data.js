@@ -7,3 +7,11 @@ export const getGDPData = query => {
 export const predict = query => {
   return post("/data/predict", query)
 }
+
+export const login = query => {
+  return post("/student/login", query)
+}
+
+export const register = query => {
+  return post("/student/register", query)
+}

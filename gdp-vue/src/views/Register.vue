@@ -8,12 +8,12 @@
         <div class="panel-right">
           <div class="panel-head">
             <div class="head-line-left"></div>
-            <div class="head-title">大学生心理健康系统 - 学生注册</div>
+            <div class="head-title">黄河流域GDP分析系统 - 注册</div>
             <div class="head-line-right"></div>
           </div>
           <el-form :model="form" :rules="rules" ref="login">
             <el-form-item prop="id">
-              <el-input v-model="form.id" placeholder="学号" class="inputLength">
+              <el-input v-model="form.id" placeholder="账号" class="inputLength">
                 <el-icon><User /></el-icon>
               </el-input>
             </el-form-item>
@@ -39,9 +39,9 @@
                 <el-icon><Key /></el-icon>
               </el-input>
             </el-form-item>
-            <div class="tip">Tips : 请输入您的学号与密码。</div>
+            <div class="tip">Tips : 请输入您的个人信息</div>
+            <div class="tip-link" @click="this.$router.push('/login')">已有帐号？点击登录</div>
             <div class="login-btn" @click="submitForm()">注册</div>
-            <div class="login-btn" @click="this.$router.push('/s_login')">登录</div>
           </el-form>
         </div>
       </div>
@@ -51,7 +51,7 @@
 
 <script>
 import { User, Key } from '@element-plus/icons-vue'
-import { register } from '@/api/Student.js'
+import { register } from '@/api/Data'
 
 export default {
   components: {
@@ -211,7 +211,11 @@ export default {
   color: #797979;
   margin-top: 10px;
   font-size: 12px;
-  margin-bottom: 20px;
+}
+.tip-link {
+  color: #2086ed;
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 
 .inputLength {

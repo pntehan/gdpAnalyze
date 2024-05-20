@@ -1,12 +1,5 @@
 import { get, post } from "../utils/request"
 
-export const login = query => {
-  return post("/student/login", query)
-}
-
-export const register = query => {
-  return post("/student/register", query)
-}
 
 export const updateUser = query => {
   return post("/student/updateUser", query)

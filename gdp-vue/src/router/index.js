@@ -75,12 +75,12 @@ const routes = [
   {
     path: "/login",
     name: "login",
-    component: () => import("@/views/user/Login.vue")
+    component: () => import("@/views/Login.vue")
   },
   {
     path: "/register",
     name: "register",
-    component: () => import("@/views/user/Register.vue")
+    component: () => import("@/views/Register.vue")
   }
 ];
 
