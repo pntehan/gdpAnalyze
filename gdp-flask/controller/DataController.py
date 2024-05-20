@@ -8,7 +8,7 @@
 # Desc    :   None
 
 
-from flask import Blueprint
+from flask import Blueprint, request
 from service.DataService import DataServcie
 
 
@@ -21,3 +21,8 @@ data_service = DataServcie()
 @DataRouter.route("/getGDPData", methods=["GET"])
 def getGDPData():
     return data_service.getGDPData()
+
+@DataRouter.route("/predict", methods=["POST"])
+def predict():
+    params = request.json
+    return data_service.predict(params)

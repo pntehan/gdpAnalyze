@@ -25,7 +25,7 @@ const routes = [
       {
         path: "/dataPredict",
         name: "dataPredict",
-        component: () => import("@/views/user/Book.vue")
+        component: () => import("@/views/user/DataPredict.vue")
       },
       {
         path: "/user",

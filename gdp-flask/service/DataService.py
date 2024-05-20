@@ -22,3 +22,16 @@ class DataServcie:
     def getGDPData(self):
         gdp_list = db.session.query(GdpData).all()
         return make_response([object2dict(gdp) for gdp in gdp_list if gdp.region in self.region_list])
+
+    def predict(self, params):
+        import random
+        # 获取参数
+        region = params["region"]
+        algo = params["algo"]
+        pred = [
+            {"region": region, "name": "地区生产总值", "value": random.randint(1000, 3000)},
+            {"region": region, "name": "第一产业增加值", "value": random.randint(1000, 3000)},
+            {"region": region, "name": "第二产业增加值", "value": random.randint(1000, 3000)},
+            {"region": region, "name": "第三产业增加值", "value": random.randint(1000, 3000)}
+        ]
+        return make_response(pred)
