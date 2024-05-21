@@ -56,7 +56,7 @@ export default {
       }, //登录表单
       rules: {
         id: [
-          { required: true, message: '请输入您的学号', trigger: 'blur' },
+          { required: true, message: '请输入您的帐号', trigger: 'blur' },
         ],
         password: [
           { required: true, message: '请输入您的密码', trigger: 'blur' }
@@ -69,7 +69,7 @@ export default {
     //登录
     submitForm() {
       let params = {
-        id: this.form.id,
+        user_id: this.form.id,
         password: this.form.password,
       }
       login(params).then((res) => {

@@ -3,7 +3,7 @@
     <h1 style="margin-top: 100px;">未来GDP预测</h1>
     <el-row :gutter="24" style="margin: 20px;">
       <el-col :span="12">
-        <el-select v-model="selectedProvince" @change="initHistoricalChart()" placeholder="选择省份">
+        <el-select v-model="selectedProvince" @change="changeRegion()" placeholder="选择省份">
           <el-option
             v-for="province in provinces"
             :key="province"
@@ -13,7 +13,7 @@
         </el-select>
       </el-col>
       <el-col :span="12">
-        <el-radio-group v-model="selectedAlgorithm">
+        <el-radio-group v-model="selectedAlgorithm" @change="changeAlgo()">
           <el-radio-button label="svr">SVM</el-radio-button>
           <el-radio-button label="xgb">XGBoost</el-radio-button>
           <el-radio-button label="forest">决策树</el-radio-button>
@@ -56,9 +56,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, defineEmits } from 'vue'
 import { getGDPData, predict } from '@/api/Data'
 import * as echarts from 'echarts'
+
+const emit = defineEmits(['change-value'])
+emit('change-value', 'dataPredict')
 
 const gdpData = ref([])
 const selectedProvince = ref('')
@@ -72,6 +75,7 @@ const decisionTreeDescription = ref('决策树算法介绍')
 const historicalChartRef = ref(null)
 const predictionChartRef = ref(null)
 const predictionData = ref([])
+const predictionNum = ref(0)
 
 onMounted(() => {
   getGDPData().then(res => {
@@ -79,7 +83,7 @@ onMounted(() => {
     // 初始化滤波数据
     provinces.value = [...new Set(gdpData.value.map((item) => item.region))]
     years.value = [...new Set(gdpData.value.map((item) => item.year))].sort((a, b) => a - b)
-    years.value.push('未来')
+    years.value.push(years.value[years.value.length-1]+1)
     selectedProvince.value = provinces.value[0]
     initHistoricalChart()
   })
@@ -160,7 +164,7 @@ function initPredictionChart() {
   })
   const option = {
     title: {
-      text: selectedProvince.value + '未来三产占比分析',
+      text: selectedProvince.value + years.value[years.value.length-1] + '年三产占比分析',
       x: 'center',
       y: 'top'
     },
@@ -193,17 +197,36 @@ function initPredictionChart() {
 
 function onPredict() {
   // 进行预测
-  gdpData.value = gdpData.value.filter(function(item) {
-    return item.year !== '未来'
-  })
-  predict({region: selectedProvince.value, algo: selectedAlgorithm.value}).then(res => {
+  predict({region: selectedProvince.value, algo: selectedAlgorithm.value, num: predictionNum.value }).then(res => {
     predictionData.value = res
     initPredictionChart()
     // 追加
     for (let item of res) {
-      item.year = '未来'
+      item.year = years.value[years.value.length-1]
       gdpData.value.push(item)
     }
+    initHistoricalChart()
+    predictionNum.value = predictionNum.value + 1
+    years.value.push(years.value[years.value.length-1]+1)
+  })
+}
+
+function changeRegion() {
+  predictionNum.value = 0
+  getGDPData().then(res => {
+    gdpData.value = res
+    years.value = [...new Set(gdpData.value.map((item) => item.year))].sort((a, b) => a - b)
+    years.value.push(years.value[years.value.length-1]+1)
+    initHistoricalChart()
+  })
+}
+
+function changeAlgo() {
+  predictionNum.value = 0
+  getGDPData().then(res => {
+    gdpData.value = res
+    years.value = [...new Set(gdpData.value.map((item) => item.year))].sort((a, b) => a - b)
+    years.value.push(years.value[years.value.length-1]+1)
     initHistoricalChart()
   })
 }

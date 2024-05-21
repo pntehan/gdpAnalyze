@@ -9,4 +9,5 @@
 
 
 from .DataController import DataRouter
+from .UserController import UserRouter
 

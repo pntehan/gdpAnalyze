@@ -18,7 +18,7 @@ export default {
 
   data() {
     return {
-      websiteName: '黄河流域GDP分析网站',
+      websiteName: '黄河流域GDP分析系统',
       tabName: 'home',
       userInfo: 'User Information',
       websiteInfo: 'Your Website Information',

@@ -13,6 +13,7 @@
           <el-select v-model="filters.name" placeholder="请选择产业" @change="filterData" style="width: 25%; margin-right: 20px;" clearable>
             <el-option v-for="name in uniqueNames" :key="name" :label="name" :value="name" />
           </el-select>
+          <el-button type="primary" @click="addData()" plain round>新增数据</el-button>
         </div>
         <el-table :data="displayedData" style="width: 100%" :header-cell-style="{ background: '#f5f7fa', color: '#606266' }">
           <!-- 表格列定义 -->
@@ -26,6 +27,11 @@
           <el-table-column prop="value" label="金额(单位：亿)">
             <template  #default="scope">
               {{ scope.row.value }} 亿元
+            </template>
+          </el-table-column>
+          <el-table-column prop="operation" label="操作">
+            <template  #default="scope">
+              <el-button type="primary" size="small" @click="editData(scope.row)" plain round>修改</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -62,9 +68,11 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineEmits } from 'vue'
 import { getGDPData } from '@/api/Data'
 
+const emit = defineEmits(['change-value'])
+emit('change-value', 'dataAnalyse')
 const gdpData = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -130,6 +138,14 @@ function handleSizeChange(newSize) {
   pageSize.value = newSize;
   currentPage.value = 1;
   updateDisplayedData();
+}
+
+function editData(item) {
+  console.log(item)
+}
+
+function addData() {
+  
 }
 </script>
 

@@ -26,3 +26,4 @@ db = SQLAlchemy(app)
 from controller import *
 
 app.register_blueprint(DataRouter)
+app.register_blueprint(UserRouter)

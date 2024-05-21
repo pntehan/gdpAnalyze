@@ -64,7 +64,7 @@ export default {
 
     handleOut() {
       localStorage.clear()
-      this.$router.push('/s_login')
+      this.$router.push('/login')
     }
   },
 };

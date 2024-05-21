@@ -17,8 +17,8 @@ DEBUG      = False
 HOST       = "127.0.0.1"
 JSON_AS_ASCII = False
 # database config
-# SQLALCHEMY_DATABASE_URI = "mysql://root:^Zh123528@127.0.0.1:3306/gdp_database"
-SQLALCHEMY_DATABASE_URI = "mysql://root:123456@127.0.0.1:3306/gdp_database"
+SQLALCHEMY_DATABASE_URI = "mysql://root:^Zh123528@127.0.0.1:3306/gdp_database"
+# SQLALCHEMY_DATABASE_URI = "mysql://root:123456@127.0.0.1:3306/gdp_database"
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 SQLALCHEMY_POOL_PRE_PING = True
 SQLALCHEMY_POOL_RECYCLE = 7200

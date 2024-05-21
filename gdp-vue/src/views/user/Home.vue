@@ -5,7 +5,7 @@
         {{ title }}
       </h3>
     </div>
-    <el-carousel height="700px" @change="changeTitle" interval="3000">
+    <el-carousel height="700px" @change="changeTitle" @click="jumpTo" interval="3000">
       <el-carousel-item v-for="item in itemList" :key="item.id">
         <img class="carousel-img" :src="item.cover">
       </el-carousel-item>
@@ -18,11 +18,11 @@ export default {
   data() {
     return {
       title: '',
-      id: 0,
+      url: '',
       itemList: [
-        {title: '历史GDP统计分析', cover: require('@/assets/cover1.jpg')},
-        {title: 'GDP数据可视化', cover: require('@/assets/cover2.jpg')},
-        {title: '未来GDP预测', cover: require('@/assets/cover3.jpg')}
+        {title: '历史GDP统计分析', cover: require('@/assets/cover1.jpg'), url: '/dataAnalyse'},
+        {title: 'GDP数据可视化', cover: require('@/assets/cover2.jpg'), url: '/dataShow'},
+        {title: '未来GDP预测', cover: require('@/assets/cover3.jpg'), url: '/dataPredict'}
       ]
     }
   },
@@ -35,10 +35,11 @@ export default {
   methods: {
     changeTitle(index) {
       this.title = this.itemList[index].title
+      this.url = this.itemList[index].url
     },
 
     jumpTo() {
-      this.$router.push('/new/'+this.id)
+      this.$router.push(this.url)
     }
   }
 }

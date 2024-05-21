@@ -14,18 +14,6 @@
       <el-form-item label="姓名" prop="name">
         <el-input v-model="userForm.name"></el-input>
       </el-form-item>
-      <el-form-item label="学号" prop="id">
-        <el-input v-model="userForm.id" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="班级" prop="classroom">
-        <el-input v-model="userForm.classroom" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="性别" prop="gender">
-        <el-radio-group v-model="userForm.gender" class="ml-4">
-          <el-radio value="男" size="large">男</el-radio>
-          <el-radio value="女" size="large">女</el-radio>
-        </el-radio-group>
-      </el-form-item>
       <el-form-item label="自我介绍" prop="intro">
         <el-input v-model="userForm.intro"></el-input>
       </el-form-item>
@@ -46,15 +34,13 @@
 import { defineComponent, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { updateUser } from '@/api/Student.js';
+import { updateUser } from '@/api/Data';
 
 export default defineComponent({
   setup(props, { emit }) {
     const userForm = ref({
       id: '',
-      classroom: '',
       name: '',
-      gender: '',
       intro: '',
       password: '',
       con_password: ''
@@ -65,9 +51,7 @@ export default defineComponent({
     onMounted(() => {
       let user_info = JSON.parse(localStorage.getItem('user_info'))
       userForm.value.id = user_info.id
-      userForm.value.classroom = user_info.classroom
       userForm.value.name = user_info.name
-      userForm.value.gender = user_info.gender
       userForm.value.intro = user_info.intro
       userForm.value.password = user_info.password
       userForm.value.con_password = user_info.password
@@ -77,17 +61,11 @@ export default defineComponent({
 
     const rules = {
       id: [
-        { required: true, message: '请输入学号', trigger: 'blur' },
-      ],
-      classroom: [
-        { required: true, message: '请输入班级号', trigger: 'blur' },
+        { required: true, message: '请输入账号', trigger: 'blur' },
       ],
       name: [
         { required: true, message: '请输入姓名', trigger: 'blur' },
         { min: 2, max: 6, message: '用户名长度在 2 到 6 个字符', trigger: 'blur' }
-      ],
-      gender: [
-        { required: true, message: '请选择性别', trigger: 'blur' }
       ],
       password: [
         { required: true, message: '请输入密码', trigger: 'blur' }
@@ -109,9 +87,7 @@ export default defineComponent({
           updateUser(userForm.value).then((res) => {
             localStorage.setItem('user_info', JSON.stringify(res.data))
             userForm.value.id = res.data.id
-            userForm.value.classroom = res.data.classroom
             userForm.value.name = res.data.name
-            userForm.value.gender = res.data.gender
             userForm.value.intro = res.data.intro
             userForm.value.password = res.data.password
             userForm.value.con_password = res.data.password

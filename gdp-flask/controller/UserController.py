@@ -8,7 +8,27 @@
 # Desc    :   None
 
 
-from flask import Blueprint
+from flask import Blueprint, request
+from service.UserService import UserService
 
 # 创建用户蓝图
 UserRouter = Blueprint("UserRouter", __name__, url_prefix="/user")
+
+# 创建服务对象
+user_service = UserService()
+
+
+@UserRouter.route("/login", methods=["POST"])
+def login():
+    params = request.json
+    return user_service.login(params)
+
+@UserRouter.route("/register", methods=["POST"])
+def register():
+    params = request.json
+    return user_service.register(params)
+
+@UserRouter.route("/updateUser", methods=["POST"])
+def updateUser():
+    params = request.json
+    return user_service.updateUser(params)

@@ -13,7 +13,7 @@
           </div>
           <el-form :model="form" :rules="rules" ref="login">
             <el-form-item prop="id">
-              <el-input v-model="form.id" placeholder="账号" class="inputLength">
+              <el-input v-model="form.name" placeholder="姓名" class="inputLength">
                 <el-icon><User /></el-icon>
               </el-input>
             </el-form-item>
@@ -22,7 +22,6 @@
                 type="password"
                 placeholder="密码"
                 v-model="form.password"
-                @keyup.enter="submitForm()"
                 class="inputLength"
               >
                 <el-icon><Key /></el-icon>
@@ -33,7 +32,16 @@
                 type="password"
                 placeholder="再输入一次密码"
                 v-model="form.cm_password"
-                @keyup.enter="submitForm()"
+                class="inputLength"
+              >
+                <el-icon><Key /></el-icon>
+              </el-input>
+            </el-form-item>
+            <el-form-item prop="intro">
+              <el-input
+                type="password"
+                placeholder="简介(可为空)"
+                v-model="form.intro"
                 class="inputLength"
               >
                 <el-icon><Key /></el-icon>
@@ -62,13 +70,14 @@ export default {
   data: function () {
     return {
       form: {
-        id: '',
+        name: '',
         password: '',
-        cm_password: ''
+        cm_password: '',
+        intro: ''
       }, //注册表单
       rules: {
-        id: [
-          { required: true, message: '请输入您的学号', trigger: 'blur' },
+        name: [
+          { required: true, message: '请输入您的姓名', trigger: 'blur' },
         ],
         password: [
           { required: true, message: '请输入您的密码', trigger: 'blur' }
@@ -77,7 +86,7 @@ export default {
           { required: true, message: '请再次输入密码', trigger: 'blur' },
           {
             validator: (rule, value, callback) => {
-              if (value !== this.password) {
+              if (value !== this.form.password) {
                 callback(new Error('两次输入的密码不一致'))
               } else {
                 callback()
@@ -93,17 +102,12 @@ export default {
   methods: {
     //注册
     submitForm() {
-      let params = {
-        id: this.form.id,
-        password: this.form.password,
-        role: '学生'
-      }
-      register(params).then((res) => {
+      register(this.form).then((res) => {
           let { data, status, msg } = res
           localStorage.setItem('user_info', JSON.stringify(data))
           if (status == '200') {
             this.$message.success('注册成功')
-            this.$router.push('/teacher')
+            this.$router.push('/login')
           } else {
             this.$message.error('注册失败:' + msg)
           }

@@ -9,9 +9,13 @@ export const predict = query => {
 }
 
 export const login = query => {
-  return post("/student/login", query)
+  return post("/user/login", query)
 }
 
 export const register = query => {
-  return post("/student/register", query)
+  return post("/user/register", query)
+}
+
+export const updateUser = query => {
+  return post("/user/updateUser", query)
 }

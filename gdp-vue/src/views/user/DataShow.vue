@@ -65,10 +65,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect, defineEmits } from 'vue'
 import * as echarts from 'echarts'
 import { getGDPData } from '@/api/Data'
 
+const emit = defineEmits(['change-value'])
+emit('change-value', 'dataShow')
 const gdpData = ref([])
 const selectedProvince = ref('')
 const selectedYear = ref('')

@@ -28,12 +28,24 @@ class DataServcie:
     def getGDPData(self):
         gdp_list = db.session.query(GdpData).all()
         return make_response([object2dict(gdp) for gdp in gdp_list if gdp.region in self.region_list])
+    
+    def perdict_loop(self, data, x, num, algo_list):
+        prev = data[-1]
+        for j in range(num):
+            p = []
+            for i, algo in enumerate(algo_list):
+                y = algo.predict([x])[0]
+                p.append(y * prev[i] + prev[i])
+            x = (np.array(p) - data[0]) / data[0]
+            prev = p
+        return prev
 
     def predict(self, params):
         import random
         # 获取参数
         region = params["region"]
         algo = params["algo"]
+        num = params["num"]
         # 输入数据准备
         data = []
         for name in self.name_list:
@@ -50,10 +62,9 @@ class DataServcie:
                 {"region": region, "name": "第二产业增加值", "value": 0},
                 {"region": region, "name": "第三产业增加值", "value": 0}
             ]
-            for i, algo in enumerate(self.algo_svr):
-                y = algo.predict([x])[0]
-                # 解码
-                pred[i]["value"] = y * data[-1][i] + data[-1][i]
+            p = self.perdict_loop(data, x, num, self.algo_svr)
+            for i in range(4):
+                pred[i]["value"] = p[i]
         elif algo == "xgb":
             pred = [
                 {"region": region, "name": "地区生产总值", "value": 0},
@@ -61,10 +72,9 @@ class DataServcie:
                 {"region": region, "name": "第二产业增加值", "value": 0},
                 {"region": region, "name": "第三产业增加值", "value": 0}
             ]
-            for i, algo in enumerate(self.algo_xgb):
-                y = algo.predict([x])[0]
-                # 解码
-                pred[i]["value"] = y * data[-1][i] + data[-1][i]
+            p = self.perdict_loop(data, x, num, self.algo_xgb)
+            for i in range(4):
+                pred[i]["value"] = p[i]
         elif algo == "forest":
             pred = [
                 {"region": region, "name": "地区生产总值", "value": 0},
@@ -72,8 +82,7 @@ class DataServcie:
                 {"region": region, "name": "第二产业增加值", "value": 0},
                 {"region": region, "name": "第三产业增加值", "value": 0}
             ]
-            for i, algo in enumerate(self.algo_forest):
-                y = algo.predict([x])[0]
-                # 解码
-                pred[i]["value"] = y * data[-1][i] + data[-1][i]
+            p = self.perdict_loop(data, x, num, self.algo_forest)
+            for i in range(4):
+                pred[i]["value"] = p[i]
         return make_response(pred)
