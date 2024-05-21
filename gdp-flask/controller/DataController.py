@@ -22,6 +22,16 @@ data_service = DataServcie()
 def getGDPData():
     return data_service.getGDPData()
 
+@DataRouter.route("/addGDPData", methods=["POST"])
+def addGDPData():
+    params = request.json
+    return data_service.addGDPData(params)
+
+@DataRouter.route("/editGDPData", methods=["POST"])
+def editGDPData():
+    params = request.json
+    return data_service.editGDPData(params)
+
 @DataRouter.route("/predict", methods=["POST"])
 def predict():
     params = request.json

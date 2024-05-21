@@ -86,3 +86,29 @@ class DataServcie:
             for i in range(4):
                 pred[i]["value"] = p[i]
         return make_response(pred)
+    
+    def addGDPData(self, params):
+        name = params["name"]
+        region = params["region"]
+        year = params["year"]
+        value = params["value"]
+        gdp_data = db.session.query(GdpData).filter(GdpData.name == name, GdpData.region == region, GdpData.year == year).first()
+        if gdp_data:
+            return make_response({"msg": "新增数据已存在", "status": "400"})
+        else:
+            gdp_data = GdpData(name, region, year, value)
+            db.session.add(gdp_data)
+            db.session.flush()
+            db.session.commit()
+            gdp_data = db.session.query(GdpData).filter(GdpData.name == name, GdpData.region == region, GdpData.year == year).first()
+            return make_response({"data": object2dict(gdp_data), "status": "200"})
+
+    def editGDPData(self, params):
+        gdp_data = db.session.query(GdpData).filter(GdpData.id == params["id"]).first()
+        gdp_data.name = params["name"]
+        gdp_data.region = params["region"]
+        gdp_data.year = params["year"]
+        gdp_data.value = params["value"]
+        db.session.commit()
+        gdp_data = db.session.query(GdpData).filter(GdpData.id == params["id"]).first()
+        return make_response({"data": object2dict(gdp_data), "status": "200"})

@@ -4,6 +4,14 @@ export const getGDPData = query => {
   return get("/data/getGDPData", query)
 }
 
+export const addGDPData = query => {
+  return post("/data/addGDPData", query)
+}
+
+export const editGDPData = query => {
+  return post("/data/editGDPData", query)
+}
+
 export const predict = query => {
   return post("/data/predict", query)
 }

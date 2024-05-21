@@ -83,19 +83,7 @@ router.beforeEach((to, from, next) => {
     next()
   } 
   else if (localStorage.getItem("user_info")) {
-    let user_info = JSON.parse(localStorage.getItem("user_info"))
-    // 管理员检查
-    if (to.fullPath.includes("admin")) {
-      if (user_info.role == "管理员") {
-        next()
-      }
-      else {
-        next("/404")
-      }
-    }
-    else {
-      next()
-    }
+    next()
   }
   else {
     next("/login")

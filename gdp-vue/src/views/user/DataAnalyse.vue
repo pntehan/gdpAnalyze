@@ -13,7 +13,7 @@
           <el-select v-model="filters.name" placeholder="请选择产业" @change="filterData" style="width: 25%; margin-right: 20px;" clearable>
             <el-option v-for="name in uniqueNames" :key="name" :label="name" :value="name" />
           </el-select>
-          <el-button type="primary" @click="addData()" plain round>新增数据</el-button>
+          <el-button type="primary" @click="addVisible = true" plain round>新增数据</el-button>
         </div>
         <el-table :data="displayedData" style="width: 100%" :header-cell-style="{ background: '#f5f7fa', color: '#606266' }">
           <!-- 表格列定义 -->
@@ -63,13 +63,98 @@
         </el-card>
       </div>
     </div>
+    <!-- 新增窗口 -->
+    <el-dialog title="新增数据" v-model="addVisible">
+      <el-form :model="form" label-width="80px">
+        <el-form-item label="省份">
+          <el-select v-model="addForm.region" placeholder="请选择省份">
+            <el-option
+              v-for="province in uniqueRegions"
+              :key="province"
+              :label="province"
+              :value="province">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产业">
+          <el-select v-model="addForm.name" placeholder="请选择产业">
+            <el-option
+              v-for="name in uniqueNames"
+              :key="name"
+              :label="name"
+              :value="name">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="年份">
+          <el-select v-model="addForm.year" placeholder="请选择年份">
+            <el-option
+              v-for="year in historyYears"
+              :key="year"
+              :label="year+'年'"
+              :value="year">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="金额(亿元)">
+          <el-input-number v-model="addForm.value" :precision="2" :step="0.01"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="addVisible = false">取消</el-button>
+        <el-button type="primary" @click="addData">确定</el-button>
+      </template>
+    </el-dialog>
+    <!-- 修改窗口 -->
+    <el-dialog title="修改数据" v-model="editVisible">
+      <el-form :model="form" label-width="80px">
+        <el-form-item label="省份">
+          <el-select v-model="editForm.region" placeholder="请选择省份">
+            <el-option
+              v-for="province in uniqueRegions"
+              :key="province"
+              :label="province"
+              :value="province">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产业">
+          <el-select v-model="editForm.name" placeholder="请选择产业">
+            <el-option
+              v-for="name in uniqueNames"
+              :key="name"
+              :label="name"
+              :value="name">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="年份">
+          <el-select v-model="editForm.year" placeholder="请选择年份">
+            <el-option
+              v-for="year in uniqueYears"
+              :key="year"
+              :label="year+'年'"
+              :value="year">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="金额(亿元)">
+          <el-input-number v-model="editForm.value" :precision="2" :step="0.01"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editVisible = false">取消</el-button>
+        <el-button type="primary" @click="onEditData">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue'
-import { getGDPData } from '@/api/Data'
+import { getGDPData, editGDPData, addGDPData } from '@/api/Data'
+import { ElMessage } from 'element-plus'
 
 const emit = defineEmits(['change-value'])
 emit('change-value', 'dataAnalyse')
@@ -82,10 +167,19 @@ const filters = ref({
   name: ''
 })
 const uniqueRegions = ref([])
+const historyYears = ref([])
 const uniqueYears = ref([])
 const uniqueNames = ref([])
 const filteredData = ref([])
 const displayedData = ref([])
+const addVisible = ref(false)
+const addForm = ref({
+  name: '', region: '', year: '', value: ''
+})
+const editVisible = ref(false)
+const editForm = ref({
+  id: '', name: '', region: '', year: '', value: ''
+})
 
 onMounted(() => {
   getGDPData().then(res => {
@@ -94,6 +188,7 @@ onMounted(() => {
     uniqueRegions.value = [...new Set(gdpData.value.map((item) => item.region))]
     uniqueYears.value = [...new Set(gdpData.value.map((item) => item.year))]
     uniqueNames.value = [...new Set(gdpData.value.map((item) => item.name))]
+    historyYears.value = Array.from({ length: 2024 - 1990 + 1 }, (_, i) => 1990 + i)
     // 初始化表格数据
     filteredData.value = gdpData.value
     updateDisplayedData()
@@ -141,11 +236,46 @@ function handleSizeChange(newSize) {
 }
 
 function editData(item) {
-  console.log(item)
+  editForm.value = item
+  editVisible.value = true
 }
 
 function addData() {
-  
+  const hasEmptyValue = Object.values(addForm.value).some(value => value === '')
+  if (!hasEmptyValue) {
+    addGDPData(addForm.value).then(res => {
+      if (res.status == 200) {
+        gdpData.value.push(res.data)
+        addVisible.value = false
+        ElMessage.success('新增数据成功!')
+      }
+      else {
+        ElMessage.error(res.msg)
+      }
+    })
+  }
+  else {
+    ElMessage.error('数据不能为空!')
+  }
+}
+
+function onEditData() {
+  const hasEmptyValue = Object.values(editForm.value).some(value => value === '')
+  if (!hasEmptyValue) {
+    editGDPData(editForm.value).then(res => {
+      gdpData.value = gdpData.value.map(item => {
+        if (item.id === res.id) {
+          return res.data
+        }
+        return item
+      })
+      editVisible.value = false
+      ElMessage.success('修改数据成功!')
+    })
+  }
+  else {
+    ElMessage.error('数据不能为空!')
+  }
 }
 </script>
 
