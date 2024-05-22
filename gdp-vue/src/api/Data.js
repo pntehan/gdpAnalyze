@@ -12,6 +12,10 @@ export const editGDPData = query => {
   return post("/data/editGDPData", query)
 }
 
+export const deleteGDPData = query => {
+  return post("/data/deleteGDPData", query)
+}
+
 export const predict = query => {
   return post("/data/predict", query)
 }

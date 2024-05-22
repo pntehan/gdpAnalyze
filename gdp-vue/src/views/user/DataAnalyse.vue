@@ -32,6 +32,7 @@
           <el-table-column prop="operation" label="操作">
             <template  #default="scope">
               <el-button type="primary" size="small" @click="editData(scope.row)" plain round>修改</el-button>
+              <el-button type="danger" size="small" @click="deleteData(scope.row)" plain round>删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -153,7 +154,7 @@
 
 <script setup>
 import { ref, onMounted, defineEmits } from 'vue'
-import { getGDPData, editGDPData, addGDPData } from '@/api/Data'
+import { getGDPData, editGDPData, addGDPData, deleteGDPData } from '@/api/Data'
 import { ElMessage } from 'element-plus'
 
 const emit = defineEmits(['change-value'])
@@ -248,6 +249,7 @@ function addData() {
         gdpData.value.push(res.data)
         addVisible.value = false
         ElMessage.success('新增数据成功!')
+        updateDisplayedData()
       }
       else {
         ElMessage.error(res.msg)
@@ -276,6 +278,17 @@ function onEditData() {
   else {
     ElMessage.error('数据不能为空!')
   }
+}
+
+function deleteData(row) {
+  deleteGDPData(row).then(res => {
+    if (res.status == 200) {
+      gdpData.value = gdpData.value.filter(item => item.id !== row.id)
+      ElMessage.success('删除数据成功!')
+      filteredData.value = gdpData.value
+      updateDisplayedData()
+    }
+  })
 }
 </script>
 

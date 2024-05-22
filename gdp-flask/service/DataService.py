@@ -112,3 +112,8 @@ class DataServcie:
         db.session.commit()
         gdp_data = db.session.query(GdpData).filter(GdpData.id == params["id"]).first()
         return make_response({"data": object2dict(gdp_data), "status": "200"})
+    
+    def deleteGDPData(self, params):
+        db.session.query(GdpData).filter(GdpData.id == params["id"]).delete()
+        db.session.commit()
+        return make_response({"status": "200"})

@@ -32,6 +32,11 @@ def editGDPData():
     params = request.json
     return data_service.editGDPData(params)
 
+@DataRouter.route("/deleteGDPData", methods=["POST"])
+def deleteGDPData():
+    params = request.json
+    return data_service.deleteGDPData(params)
+
 @DataRouter.route("/predict", methods=["POST"])
 def predict():
     params = request.json
